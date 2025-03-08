@@ -21,3 +21,6 @@ Content-Type: application/json
 	"email": "lam.cao1206@hcmut.edu.vn",
 	"password": "123456"
 }
+
+### Logout
+POST  {{base_url}}/v1/api/auth/logout
