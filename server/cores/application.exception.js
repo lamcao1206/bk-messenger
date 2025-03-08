@@ -1,4 +1,4 @@
-class ApplicationException extends Error {
+export class ApplicationException extends Error {
   constructor(statusCode = 500, message) {
     super(message);
     this.statusCode = statusCode;
@@ -6,27 +6,20 @@ class ApplicationException extends Error {
   }
 }
 
-class NotFoundException extends ApplicationException {
+export class NotFoundException extends ApplicationException {
   constructor(message) {
     super(404, message);
   }
 }
 
-class UnauthorizedException extends ApplicationException {
+export class UnauthorizedException extends ApplicationException {
   constructor(message) {
     super(401, message);
   }
 }
 
-class BadRequestException extends ApplicationException {
+export class BadRequestException extends ApplicationException {
   constructor(message) {
     super(400, message);
   }
 }
-
-module.exports = {
-  ApplicationException,
-  NotFoundException,
-  UnauthorizedException,
-  BadRequestException,
-};

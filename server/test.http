@@ -1,0 +1,14 @@
+@base_url=http://localhost:3000
+
+### Test APIs
+GET {{base_url}}
+
+### Create new account
+POST {{base_url}}/v1/api/auth/signup
+Content-Type: application/json
+
+{
+	"username": "Lam Cao",
+	"email": "lam.cao1206@hcmut.edu.vn",
+	"password": "123456"
+}

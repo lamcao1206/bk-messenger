@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      minLength: 8,
+      minLength: 4,
     },
     avatarImage: {
       type: String,
@@ -47,4 +47,5 @@ userSchema.methods.matchPassword = async function (input) {
 };
 
 const User = mongoose.model('User', userSchema);
+
 export default User;
