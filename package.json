@@ -1,0 +1,15 @@
+{
+  "name": "bk-messenger",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Cao Ngoc Lam <lam.cao1206@hcmut.edu.vn>",
+  "license": "MIT",
+  "scripts": {
+    "server": "cd server && yarn dev",
+    "client": "cd client && yarn dev",
+    "dev": "concurrently \"yarn server\" \"yarn client\""
+  },
+  "dependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
