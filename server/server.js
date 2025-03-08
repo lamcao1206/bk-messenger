@@ -8,7 +8,6 @@ import cookieParser from 'cookie-parser';
 const app = express();
 const port = process.env.PORT || 3000;
 const mongoUrl = process.env.DB_URL || 'mongodb://localhost:27017/bk-messenger';
-console.log(process.env.PORT);
 
 app.use(
   cors({

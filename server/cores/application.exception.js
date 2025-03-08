@@ -18,6 +18,12 @@ export class UnauthorizedException extends ApplicationException {
   }
 }
 
+export class ForbiddenException extends ApplicationException {
+  constructor(message) {
+    super(403, message);
+  }
+}
+
 export class BadRequestException extends ApplicationException {
   constructor(message) {
     super(400, message);
