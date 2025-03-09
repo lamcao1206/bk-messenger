@@ -1,11 +1,25 @@
 import toast from 'react-hot-toast';
 import Button from '../common/Button';
 import Input from '../common/Input';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FaUser, FaEnvelope, FaLock } from 'react-icons/fa';
+import { useFetch } from '../../hooks/useFetch';
+import { authAPI } from '../../constants';
+import _ from 'lodash';
 
 export default function RegisterForm() {
-  const [formData, setFormData] = useState({ username: '', email: '', password: '' });
+  const [formData, setFormData] = useState({ username: '', email: '', password: '', confirmPassword: '' });
+  const { error: submitError, isLoading: isSubmitLoading, sendRequest } = useFetch();
+
+  useEffect(() => {
+    if (submitError?.errors) {
+      submitError.errors.forEach((e) => {
+        toast.error(e.msg);
+      });
+    } else if (submitError?.message) {
+      toast.error(submitError.message);
+    }
+  }, [submitError]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -15,10 +29,31 @@ export default function RegisterForm() {
     }));
   };
 
+  const handleSubmitValidate = () => {
+    const { username, email, password, confirmPassword } = formData;
+    const check = [username, email, password];
+    if (check.some((el) => el === '')) {
+      toast.error('All fields are required!');
+      return false;
+    }
+
+    if (password !== confirmPassword) {
+      toast.error('Password and confirm password do not match');
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('clicked');
-    toast.success('Register successfully');
+    const validateInput = handleSubmitValidate();
+    if (validateInput) {
+      const config = { method: 'POST', url: authAPI.register, data: _.pick(formData, ['username', 'email', 'password']) };
+      sendRequest(config, (data) => {
+        toast.success('Register successfully!');
+        setTimeout(() => (window.location.href = '/login'), 1000);
+      });
+    }
   };
 
   return (
@@ -65,8 +100,22 @@ export default function RegisterForm() {
           icon={<FaLock className="text-neutral-500" />}
         />
       </div>
+      <div className="mb-6">
+        <label className="block text-neutral-700 text-sm font-medium mb-2" htmlFor="password">
+          Confirm Password
+        </label>
+        <Input
+          id="confirmPassword"
+          name="confirmPassword"
+          type="password"
+          placeholder="Confirm your password"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          icon={<FaLock className="text-neutral-500" />}
+        />
+      </div>
       <div className="flex items-center justify-between">
-        <Button type="submit">Sign Up</Button>
+        <Button type="submit">{isSubmitLoading ? 'Loading...' : 'Sign Up'}</Button>
       </div>
       <div className="mt-4 text-center">
         <a href="/login" className="text-sm text-blue-700 hover:underline transition-colors">

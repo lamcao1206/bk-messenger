@@ -19,7 +19,7 @@ class AuthController {
 
     return res.status(201).json({
       status: 201,
-      user,
+      user: getDataInfo(['_id', 'username', 'email', 'avatarImage'], user),
     });
   }
 
@@ -45,7 +45,7 @@ class AuthController {
       sameSite: 'None',
       maxAge: 3 * 24 * 60 * 60 * 1000,
     });
-    return res.status(200).json({ token: accessToken, user: getDataInfo(['username', 'email'], user) });
+    return res.status(200).json({ token: accessToken, user: getDataInfo(['_id', 'username', 'email', 'avatarImage'], user) });
   }
 
   static async refresh(req, res, next) {

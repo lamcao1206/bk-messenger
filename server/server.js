@@ -4,6 +4,7 @@ import cors from 'cors';
 import router from './routes/index.js';
 import { NotFoundException } from './cores/application.exception.js';
 import cookieParser from 'cookie-parser';
+import morgan from 'morgan';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -18,6 +19,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser(process.env.COOKIE_SIGNATURE));
+app.use(morgan('dev'));
 
 app.use(router);
 

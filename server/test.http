@@ -8,8 +8,8 @@ POST {{base_url}}/v1/api/auth/signup
 Content-Type: application/json
 
 {
-	"username": "Lam Cao",
-	"email": "lam.cao1206@hcmut.edu.vn",
+	"username": "Hoang Nguyen",
+	"email": "hoang@hcmut.edu.vn",
 	"password": "123456"
 }
 
