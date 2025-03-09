@@ -27,11 +27,13 @@ class AuthController {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
+
     if (!user) {
       throw new UnauthorizedException('Unauthorized');
     }
+    const isPasswordMatch = await user.matchPassword(password);
 
-    if (!user.matchPassword(password)) {
+    if (!isPasswordMatch) {
       throw new UnauthorizedException('Wrong password');
     }
 

@@ -1,13 +1,28 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Button from '../common/Button';
 import Input from '../common/Input';
 import { FaEnvelope, FaLock } from 'react-icons/fa';
+import toast from 'react-hot-toast';
+import { useFetch } from '../../hooks/useFetch';
+import { authAPI } from '../../constants';
+import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginForm() {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const { error: submitError, isLoading: isSubmitLoading, sendRequest } = useFetch();
+  const { setUser, setToken } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (submitError?.errors) {
+      submitError.errors.forEach((e) => {
+        toast.error(e.msg);
+      });
+    } else if (submitError?.error) {
+      toast.error(submitError.error);
+    }
+  }, [submitError]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -17,8 +32,28 @@ export default function LoginForm() {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmitValidate = () => {
+    const { email, password } = formData;
+    const check = [email, password];
+    if (check.some((el) => el === '')) {
+      toast.error('All fields are required!');
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
+    const validateInput = handleSubmitValidate();
+    if (validateInput) {
+      const config = { method: 'POST', url: authAPI.login, data: formData };
+      sendRequest(config, (data) => {
+        toast.success('Login successfully!');
+        setUser(data.user);
+        setToken(data.token);
+        setTimeout(navigate('/'), 1000);
+      });
+    }
   };
 
   return (
@@ -52,7 +87,7 @@ export default function LoginForm() {
         />
       </div>
       <div className="flex items-center justify-between">
-        <Button type="submit">Sign In</Button>
+        <Button type="submit">{isSubmitLoading ? 'Loading...' : 'Login'}</Button>
       </div>
       <div className="mt-4 text-center">
         <a href="/signup" className="text-sm text-blue-700 hover:underline transition-colors">
