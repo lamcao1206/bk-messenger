@@ -6,6 +6,7 @@ import Input from '../../components/common/Input';
 import { useFetch } from '../../hooks/useFetch';
 import toast from 'react-hot-toast';
 import { userAPI } from '../../constants';
+import Avatar from '../../components/common/Avatar';
 
 export default function Profile() {
   const { user, setUser } = useAuth();
@@ -71,16 +72,7 @@ export default function Profile() {
         <h2 className="text-2xl font-semibold mb-6 text-center text-blue-600">Profile</h2>
         <div className="flex flex-col items-center gap-4">
           <div className="relative">
-            {avatarImage.length === 0 ? (
-              <div
-                className="size-25 rounded-full object-cover flex items-center justify-center border-2 border-gray-400"
-                style={{ backgroundColor: '#0080FE' }}
-              >
-                <span className="text-white font-light text-4xl">{user.username[0]}</span>
-              </div>
-            ) : (
-              <img src={avatarImage} alt="Avatar" className="size-25 rounded-full object-cover" />
-            )}
+            <Avatar avatarImage={avatarImage} username={user.username} className="size-25" />
             <label htmlFor="avatar-upload" className="absolute bottom-0 right-0 bg-gray-100 hover:scale-105 p-2 rounded-full cursor-pointer">
               <FaCamera className="w-5 h-5 text-gray-800" />
               <input

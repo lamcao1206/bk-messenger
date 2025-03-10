@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import DropdownMenu from './DropdownNavbar';
+import Avatar from '../common/Avatar';
 
 export default function Navbar() {
   const { setToken, user, setUser } = useAuth();
@@ -41,13 +42,7 @@ export default function Navbar() {
                 aria-label="User menu"
                 aria-haspopup="true"
               >
-                {user?.avatarImage.length == 0 ? (
-                  <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#0080FE' }}>
-                    <span className="text-white font-light text-xl">{user.username[0]}</span>
-                  </div>
-                ) : (
-                  <img className="h-12 w-12 rounded-full" src={user.avatarImage} alt="User avatar" />
-                )}
+                <Avatar avatarImage={user.avatarImage} username={user.username} className="h-12 w-12" />
                 {isOpen ? <FaChevronUp className="ml-2 text-gray-400" /> : <FaChevronDown className="ml-2 text-gray-400" />}
               </button>
               <DropdownMenu isOpen={isOpen} onClose={closeDropdown} onLogout={handleLogout} />
