@@ -1,6 +1,8 @@
+import { UnauthorizedException } from '../cores/application.exception.js';
 import User from '../models/user.model.js';
+import jwt from 'jsonwebtoken';
 
-async function authenticateMiddleware(req, res, next) {
+export default async function authenticateMiddleware(req, res, next) {
   let accessToken = null;
 
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
@@ -11,7 +13,7 @@ async function authenticateMiddleware(req, res, next) {
     next(new UnauthorizedException('Unauthorized request'));
   }
 
-  jwt.verify(accessToken, process.env.ACCESS_SECRET_KEY, async (err, decoded) => {
+  jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, async (err, decoded) => {
     if (err) {
       return next(err);
     }

@@ -89,11 +89,6 @@ export default function LoginForm() {
       <div className="flex items-center justify-between">
         <Button type="submit">{isSubmitLoading ? 'Loading...' : 'Login'}</Button>
       </div>
-      <div className="mt-4 text-center">
-        <a href="/signup" className="text-sm text-blue-700 hover:underline transition-colors">
-          Don't have an account?
-        </a>
-      </div>
     </form>
   );
 }

@@ -117,11 +117,6 @@ export default function RegisterForm() {
       <div className="flex items-center justify-between">
         <Button type="submit">{isSubmitLoading ? 'Loading...' : 'Sign Up'}</Button>
       </div>
-      <div className="mt-4 text-center">
-        <a href="/login" className="text-sm text-blue-700 hover:underline transition-colors">
-          Already have an account?
-        </a>
-      </div>
     </form>
   );
 }

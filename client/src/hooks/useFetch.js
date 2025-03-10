@@ -53,9 +53,9 @@ export const useFetch = () => {
       setIsLoading(true);
 
       try {
-        if (token?.accessToken) {
+        if (token) {
           config.headers = {
-            Authorization: `Bearer ${token.accessToken}`,
+            Authorization: `Bearer ${token}`,
           };
         }
         const result = await instance.request(config);

@@ -47,7 +47,7 @@ class AuthController {
       sameSite: 'None',
       maxAge: 3 * 24 * 60 * 60 * 1000,
     });
-    return res.status(200).json({ token: accessToken, user: getDataInfo(['_id', 'username', 'email', 'avatarImage'], user) });
+    return res.status(200).json({ token: accessToken, user: getDataInfo(['_id', 'username', 'email', 'avatarImage', 'createdAt'], user) });
   }
 
   static async refresh(req, res, next) {
@@ -78,6 +78,8 @@ class AuthController {
     });
     return res.json({ message: 'Success' });
   }
+
+  static async updateProfile(req, res, next) {}
 }
 
 export default AuthController;
