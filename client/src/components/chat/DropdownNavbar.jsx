@@ -12,7 +12,7 @@ export default function DropdownNavbar({ isOpen, onClose, onLogout }) {
           <FaUser className="mr-2" />
           Your Profile
         </Link>
-        <Link to="/settings" className="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-700" onClick={onClose}>
+        <Link to="/share" className="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-700" onClick={onClose}>
           <LuScreenShare className="mr-2" />
           Share screen
         </Link>

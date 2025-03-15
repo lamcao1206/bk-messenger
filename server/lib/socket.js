@@ -7,7 +7,6 @@ export function initializeSocket(server, corsOption) {
   let onlineUsers = new Map();
 
   io.on('connection', (socket) => {
-    console.log('connect');
     socket.on('ONLINE', (userId, socketId) => {
       const existedSocketId = onlineUsers.get(userId);
       if (existedSocketId && prevSocketId !== socketId) {
@@ -15,9 +14,11 @@ export function initializeSocket(server, corsOption) {
       } else if (!existedSocketId) {
         onlineUsers[userId] = socketId;
       }
+      console.log(onlineUsers);
     });
     socket.on('OFFLINE', (userId) => {
       onlineUsers.delete(userId);
+      console.log(onlineUsers);
     });
   });
 }

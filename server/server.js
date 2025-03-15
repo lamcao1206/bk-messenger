@@ -1,15 +1,14 @@
 import express from 'express';
-import mongoose from 'mongoose';
 import cors from 'cors';
 import router from './routes/index.js';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import { NotFoundException } from './cores/application.exception.js';
 import { initializeSocket } from './lib/socket.js';
+import initializeDatabase from './lib/db.js';
 
 const app = express();
 const port = process.env.PORT || 3000;
-const mongoUrl = process.env.DB_URL || 'mongodb://localhost:27017/bk-messenger';
 
 const corsOptions = {
   origin: process.env.URL_CLIENT || 'http://localhost:5173',
@@ -40,8 +39,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-mongoose
-  .connect(mongoUrl)
+initializeDatabase()
   .then(() => {
     console.log('Connected to MongoDB');
     const server = app.listen(port, () => {

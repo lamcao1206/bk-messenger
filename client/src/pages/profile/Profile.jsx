@@ -68,7 +68,7 @@ export default function Profile() {
 
   return (
     <div className="h-screen flex items-center justify-center">
-      <Card className="max-w-2xl">
+      <Card className="max-w-lg p-8">
         <h2 className="text-2xl font-semibold mb-6 text-center text-blue-600">Profile</h2>
         <div className="flex flex-col items-center gap-4">
           <div className="relative">

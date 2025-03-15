@@ -4,22 +4,27 @@ import { useAuth } from '../../contexts/AuthContext';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import DropdownMenu from './DropdownNavbar';
 import Avatar from '../common/Avatar';
+import { useSocket } from '../../contexts/SocketContext';
 
 export default function Navbar() {
   const { setToken, user, setUser } = useAuth();
+  const {
+    socketState: { socket },
+  } = useSocket();
+
   const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = () => {
+    socket.emit('OFFLINE', user._id);
     setUser(null);
     setToken(null);
   };
 
   const toggleDropdown = () => setIsOpen(!isOpen);
   const closeDropdown = () => setIsOpen(false);
-  console.log(user.avatarImage);
 
   return (
-    <nav className="bg-white shadow-lg">
+    <nav className="bg-white shadow-lg sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex justify-between items-center">
