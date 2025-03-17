@@ -24,3 +24,8 @@ Content-Type: application/json
 
 ### Logout
 POST  {{base_url}}/v1/api/auth/logout
+
+### Search
+GET {{base_url}}/v1/api/user/search?q=Nguyen
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxhbS5jYW8xMjA2QGhjbXV0LmVkdS52biIsImlhdCI6MTc0MjIxNzI5MiwiZXhwIjoxNzQyMzAzNjkyfQ.V2sA6ZeaLvWigt-kJdFeo0wa1pzMCgsYp_Qml_2ACOA
+

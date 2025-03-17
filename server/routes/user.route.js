@@ -7,5 +7,6 @@ import { upload } from '../middlewares/multer.middleware.js';
 const router = express.Router();
 
 router.put('/upload', authenticateMiddleware, upload.single('avatar'), asyncHandler(UserController.upload));
+router.get('/search', authenticateMiddleware, asyncHandler(UserController.search));
 
 export default router;
