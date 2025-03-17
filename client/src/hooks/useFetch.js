@@ -3,6 +3,7 @@ import axios from 'axios';
 import { authAPI } from '../constants';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
+import { useSocket } from '../contexts/SocketContext';
 
 const instance = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
@@ -10,10 +11,36 @@ const instance = axios.create({
 });
 
 export const useFetch = () => {
+  const { user, setUser } = useAuth();
   const { token, setToken } = useAuth();
+  const {
+    socketState: { socket },
+  } = useSocket();
 
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const logout = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      await instance.request({
+        method: 'POST',
+        url: authAPI.logout,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setToken(null);
+      setUser(null);
+      socket.emit('OFFLINE', user._id);
+      toast.success('Successfully logged out');
+    } catch (e) {
+      setError(e?.response?.data || e);
+      toast.error('Logout failed: ' + e.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [token, setToken, setUser, socket, user?._id]);
 
   const refreshToken = useCallback(
     async (config, cb) => {
@@ -36,15 +63,15 @@ export const useFetch = () => {
               cb(result.data);
             }
           } catch (e) {
-            // setError(e?.response?.data || e);
             toast.error(e.message);
           }
         }
       } catch (e) {
-        toast.error(e.message);
+        toast.error('Session expired - please log in again');
+        await logout();
       }
     },
-    [setToken]
+    [setToken, logout]
   );
 
   const sendRequest = useCallback(

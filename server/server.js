@@ -6,6 +6,8 @@ import morgan from 'morgan';
 import { NotFoundException } from './cores/application.exception.js';
 import { initializeSocket } from './lib/socket.js';
 import initializeDatabase from './lib/db.js';
+import jwt from 'jsonwebtoken';
+const { TokenExpiredError } = jwt;
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -29,9 +31,12 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  console.log(err);
-  const statusCode = err.statusCode || 500;
-  const error = err.message || 'Internal Server Error';
+  let statusCode = err.statusCode || 500;
+  let error = err.message || 'Internal Server Error';
+  if (err instanceof TokenExpiredError) {
+    statusCode = 403;
+  }
+
   return res.status(statusCode).json({
     status: statusCode,
     error,
