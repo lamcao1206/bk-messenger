@@ -4,7 +4,10 @@ import Room from '../models/room.model.js';
 export default class ChatController {
   static async getContactList(req, res, next) {
     const userId = req.user._id;
-    const rooms = await Room.find({ users: userId }).populate('users', 'username avatarImage').populate('admin', 'username avatarImage').lean();
+    const rooms = await Room.find({ users: userId })
+      .populate('users', 'username avatarImage')
+      .populate('admin', 'username avatarImage')
+      .lean();
 
     if (!rooms || rooms.length === 0) {
       return res.status(200).json({ success: true, rooms: [] });
@@ -13,7 +16,10 @@ export default class ChatController {
     const roomsRecord = await Promise.all(
       rooms.map(async (room) => {
         const { _id, name, avatarImage, chatType, users, admin } = room;
-        const latestMessage = await Message.findOne({ room: _id }).sort({ createdAt: -1 }).populate('sender', 'username').lean();
+        const latestMessage = await Message.findOne({ room: _id })
+          .sort({ createdAt: -1 })
+          .populate('sender', 'username')
+          .lean();
         let roomRecord;
         if (chatType === 'chatbox') {
           // A chatbox only have 2 users
@@ -24,7 +30,10 @@ export default class ChatController {
             avatarImage: otherUser.avatarImage,
             latestMessage: latestMessage
               ? {
-                  text: latestMessage.type === 'text' ? latestMessage.content : `${latestMessage.sender.username} sent an attachment`,
+                  text:
+                    latestMessage.type === 'text'
+                      ? latestMessage.content
+                      : `${latestMessage.sender.username} sent an attachment`,
                   sender: latestMessage.sender.username,
                   timestamp: latestMessage.createdAt,
                 }
@@ -39,7 +48,10 @@ export default class ChatController {
             chatType,
             latestMessage: latestMessage
               ? {
-                  text: latestMessage.type === 'text' ? latestMessage.content : `${latestMessage.sender.username} sent an attachment`,
+                  text:
+                    latestMessage.type === 'text'
+                      ? latestMessage.content
+                      : `${latestMessage.sender.username} sent an attachment`,
                   sender: latestMessage.sender.username,
                   timestamp: latestMessage.createdAt,
                 }
@@ -52,6 +64,22 @@ export default class ChatController {
     return res.status(200).json({
       success: true,
       rooms: roomsRecord,
+    });
+  }
+
+  static async createRoom(req, res, next) {
+    const roomType = req.params.roomType;
+    const newRoom = new Room({
+      name: req.body.name,
+      users: req.body.users,
+      admin: req.body.admin,
+      avatarImage: req.body.avatarImage,
+      chatType: roomType,
+    });
+    await newRoom.save();
+    return res.status(200).json({
+      success: true,
+      room: newRoom,
     });
   }
 }
