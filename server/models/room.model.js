@@ -8,8 +8,27 @@ const roomSchema = new mongoose.Schema(
       unique: true,
     },
     users: {
-      type: Array,
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User',
+          required: true,
+        },
+      ],
       required: true,
+      validate: {
+        validator: function (v) {
+          return v.length > 0;
+        },
+        message: 'A room must have at least one user',
+      },
+    },
+    admin: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: function () {
+        return this.chatType === 'room';
+      },
     },
     avatarImage: {
       type: String,
@@ -17,7 +36,8 @@ const roomSchema = new mongoose.Schema(
     },
     chatType: {
       type: String,
-      default: 'room',
+      default: 'chatbox',
+      enum: ['chatbox', 'room'],
     },
   },
   {
