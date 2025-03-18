@@ -20,6 +20,11 @@ const messageSchema = new mongoose.Schema(
       type: Array,
       default: [],
     },
+    room: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Room',
+      required: true,
+    },
   },
   {
     timestamps: true,

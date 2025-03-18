@@ -86,7 +86,6 @@ export const useFetch = () => {
           };
         }
         const result = await instance.request(config);
-        console.log(result);
         if (result?.data && cb) {
           cb(result.data);
         }
