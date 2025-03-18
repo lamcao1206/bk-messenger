@@ -11,6 +11,7 @@ import Navbar from './components/chat/NavBar';
 import { useSocket } from './contexts/SocketContext';
 import ScreenSharing from './pages/share/ScreenSharing';
 import Host from './pages/share/Host';
+import Friend from './pages/friend/Friend';
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
@@ -88,6 +89,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Host />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/friends"
+          element={
+            <ProtectedRoute>
+              <Friend />
             </ProtectedRoute>
           }
         />

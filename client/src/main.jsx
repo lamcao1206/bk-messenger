@@ -5,13 +5,16 @@ import './index.css';
 import App from './App.jsx';
 import { AuthContextProvider } from './contexts/AuthContext.jsx';
 import { SocketContextProvider } from './contexts/SocketContext.jsx';
+import { ChatContextProvider } from './contexts/ChatContext.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <AuthContextProvider>
         <SocketContextProvider>
-          <App />
+          <ChatContextProvider>
+            <App />
+          </ChatContextProvider>
         </SocketContextProvider>
       </AuthContextProvider>
     </BrowserRouter>

@@ -61,6 +61,7 @@ export default function Profile() {
       },
       (err) => {
         toast.error('Failed to update avatar', { id: toastId });
+        console.log(err);
         setIsUpdatingProfile(false);
       }
     );
@@ -73,7 +74,10 @@ export default function Profile() {
         <div className="flex flex-col items-center gap-4">
           <div className="relative">
             <Avatar avatarImage={avatarImage} username={user.username} className="size-25" />
-            <label htmlFor="avatar-upload" className="absolute bottom-0 right-0 bg-gray-100 hover:scale-105 p-2 rounded-full cursor-pointer">
+            <label
+              htmlFor="avatar-upload"
+              className="absolute bottom-0 right-0 bg-gray-100 hover:scale-105 p-2 rounded-full cursor-pointer"
+            >
               <FaCamera className="w-5 h-5 text-gray-800" />
               <input
                 type="file"
