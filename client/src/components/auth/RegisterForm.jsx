@@ -54,7 +54,7 @@ export default function RegisterForm() {
         data: _.pick(formData, ['username', 'email', 'password']),
       };
       sendRequest(config, (_) => {
-        toast.success('Register successfully!');
+        console.log(_);
         setTimeout(() => (window.location.href = '/login'), 1000);
       });
     }

@@ -90,7 +90,9 @@ export const useFetch = () => {
           cb(result.data);
         }
       } catch (e) {
+        console.log(e);
         e?.response?.status === 403 ? refreshToken(config, cb) : setError(e?.response?.data || e);
+        // toast.error(e?.response.data.message || e.message);
       } finally {
         setIsLoading(false);
       }

@@ -106,6 +106,7 @@ export default class UserController {
   static async handleFriendRequest(req, res, next) {
     const userId = req.user._id;
     const action = req.query.action;
+    const friendshipId = req.params.friendshipId;
 
     if (!action || !['accept', 'reject'].includes(action)) {
       next(new BadRequestException('Invalid action. Use "accept" or "reject"'));
@@ -164,7 +165,15 @@ export default class UserController {
     const userId = req.user._id;
 
     const friendRequests = await Friendship.find({
-      $or: [{ user1: userId, status: 'pending' }, { user2: userId, status: 'pending' }, { requester: { $ne: userId } }],
+      $and: [
+        {
+          $or: [
+            { user1: userId, status: 'pending' },
+            { user2: userId, status: 'pending' },
+          ],
+        },
+        { requester: { $ne: userId } },
+      ],
     })
       .populate('user1', 'username avatarImage')
       .populate('user2', 'username avatarImage')
@@ -175,7 +184,7 @@ export default class UserController {
       return res.status(200).json({
         success: true,
         message: 'No pending friend requests found',
-        friendRequests: [],
+        requests: [],
         count: 0,
       });
     }
@@ -189,6 +198,7 @@ export default class UserController {
           username: requester.username,
           avatarImage: requester.avatarImage,
         },
+        status: request.status,
         createdAt: request.createdAt,
       };
     });

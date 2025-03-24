@@ -10,7 +10,7 @@ router.put('/upload', authenticateMiddleware, upload.single('avatar'), asyncHand
 router.get('/search', authenticateMiddleware, asyncHandler(UserController.search));
 router.get('/requests', authenticateMiddleware, asyncHandler(UserController.getAllFriendRequest));
 router.post('/request/:id', authenticateMiddleware, asyncHandler(UserController.sendFriendRequest));
-router.put('/friends/:friendshipId', authenticateMiddleware, asyncHandler(UserController.handleFriendRequest));
+router.put('/request/:friendshipId', authenticateMiddleware, asyncHandler(UserController.handleFriendRequest));
 router.get('/find', authenticateMiddleware, asyncHandler(UserController.getALlUsersWithRelationship));
 
 export default router;

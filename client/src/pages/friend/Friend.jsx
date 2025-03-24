@@ -5,6 +5,8 @@ import FriendTabs from '../../components/friends/FriendTabs';
 import { useFetch } from '../../hooks/useFetch';
 import { userAPI } from '../../constants';
 import UserContent from '../../components/friends/UserContent';
+import { method } from 'lodash';
+import RequestContent from '../../components/friends/RequestContent';
 
 function FriendCardBanner() {
   return (
@@ -17,7 +19,9 @@ function FriendCardBanner() {
 export default function Friend() {
   const [activeTab, setActiveTab] = useState('allFriends');
   const [users, setUsers] = useState([]);
+  const [requests, setRequests] = useState([]);
   const { error, isLoading, sendRequest } = useFetch();
+  console.log(requests);
 
   useEffect(() => {
     const handleFetchAllUsers = async () => {
@@ -26,8 +30,16 @@ export default function Friend() {
         setUsers(data.users);
       });
     };
-    if (activeTab == 'allUsers') {
+    const handleFetchAllIncomingRequest = async () => {
+      const config = { method: 'GET', url: userAPI.getAllIncomingRequest };
+      sendRequest(config, (data) => {
+        setRequests(data.requests);
+      });
+    };
+    if (activeTab === 'allUsers') {
       handleFetchAllUsers();
+    } else if (activeTab === 'friendRequests') {
+      handleFetchAllIncomingRequest();
     }
   }, [activeTab, sendRequest]);
 
@@ -36,7 +48,10 @@ export default function Friend() {
       <Card className="max-w-2xl w-full p-5">
         <FriendCardBanner />
         <FriendTabs activeTab={activeTab} setActiveTab={setActiveTab} />
-        {activeTab === 'allUsers' && <UserContent users={users} sendRequest={sendRequest} />}
+        {activeTab === 'allUsers' && <UserContent users={users} setUsers={setUsers} sendRequest={sendRequest} />}
+        {activeTab === 'friendRequests' && (
+          <RequestContent requests={requests} setRequests={setRequests} sendRequest={sendRequest} />
+        )}
       </Card>
     </div>
   );

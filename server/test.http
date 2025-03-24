@@ -43,4 +43,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxhbS5jY
 GET {{base_url}}/v1/api/user/requests
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxhbS5jYW8xMjA2QGhjbXV0LmVkdS52biIsImlhdCI6MTc0MjgxNjc2OSwiZXhwIjoxNzQyOTAzMTY5fQ.uEGD84YJMK88ZyWXKtMsDS-WRi_o0-Wz0biukGkejMI
 
+### Fetch all incoming friend requests
+PUT {{base_url}}/v1/api/user/request/67e145520aa9f4ee95deee3f?action=accept
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxhbS5jYW8xMjA2QGhjbXV0LmVkdS52biIsImlhdCI6MTc0MjgxNjc2OSwiZXhwIjoxNzQyOTAzMTY5fQ.uEGD84YJMK88ZyWXKtMsDS-WRi_o0-Wz0biukGkejMI
+
 
