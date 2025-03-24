@@ -160,10 +160,48 @@ export default class UserController {
     }
   }
 
-  static async getALlUsersWithRelationship(req, res, next) {
+  static async getAllFriendRequest(req, res, next) {
     const userId = req.user._id;
 
-    const totalUsers = await User.countDocuments({ _id: { $ne: userId } });
+    const friendRequests = await Friendship.find({
+      $or: [{ user1: userId, status: 'pending' }, { user2: userId, status: 'pending' }, { requester: { $ne: userId } }],
+    })
+      .populate('user1', 'username avatarImage')
+      .populate('user2', 'username avatarImage')
+      .populate('requester', 'username avatarImage')
+      .lean();
+
+    if (!friendRequests || friendRequests.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: 'No pending friend requests found',
+        friendRequests: [],
+        count: 0,
+      });
+    }
+
+    const formatRecord = friendRequests.map((request) => {
+      const requester = request.requester; // The user who sent the request
+      return {
+        _id: request._id,
+        requester: {
+          _id: requester._id,
+          username: requester.username,
+          avatarImage: requester.avatarImage,
+        },
+        createdAt: request.createdAt,
+      };
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Friend requests fetched successfully',
+      requests: formatRecord,
+    });
+  }
+
+  static async getALlUsersWithRelationship(req, res, next) {
+    const userId = req.user._id;
 
     const users = await User.find({ _id: { $ne: userId } })
       .select('username avatarImage')
@@ -173,10 +211,6 @@ export default class UserController {
       return res.status(200).json({
         success: true,
         users: [],
-        count: 0,
-        totalPages: 0,
-        currentPage: page,
-        limit,
       });
     }
 

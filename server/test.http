@@ -29,3 +29,18 @@ POST  {{base_url}}/v1/api/auth/logout
 GET {{base_url}}/v1/api/user/search?q=Nguyen
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxhbS5jYW8xMjA2QGhjbXV0LmVkdS52biIsImlhdCI6MTc0MjIxNzI5MiwiZXhwIjoxNzQyMzAzNjkyfQ.V2sA6ZeaLvWigt-kJdFeo0wa1pzMCgsYp_Qml_2ACOA
 
+
+### Fetch contact lists
+GET {{base_url}}/v1/api/chat/contacts
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxhbS5jYW8xMjA2QGhjbXV0LmVkdS52biIsImlhdCI6MTc0MjMwMjk0NywiZXhwIjoxNzQyMzg5MzQ3fQ.hb8lsytsFKlJdY2WIlYb6lOg1pqE3Siu4CEVPVAJOgQ
+
+
+### Fetch users
+GET {{base_url}}/v1/api/user/find
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxhbS5jYW8xMjA2QGhjbXV0LmVkdS52biIsImlhdCI6MTc0MjgxNjc2OSwiZXhwIjoxNzQyOTAzMTY5fQ.uEGD84YJMK88ZyWXKtMsDS-WRi_o0-Wz0biukGkejMI
+
+### Fetch all incoming friend requests
+GET {{base_url}}/v1/api/user/requests
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxhbS5jYW8xMjA2QGhjbXV0LmVkdS52biIsImlhdCI6MTc0MjgxNjc2OSwiZXhwIjoxNzQyOTAzMTY5fQ.uEGD84YJMK88ZyWXKtMsDS-WRi_o0-Wz0biukGkejMI
+
+

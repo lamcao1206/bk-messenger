@@ -31,6 +31,9 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
+  if (process.env.NODE_ENV === 'dev') {
+    console.error(err);
+  }
   let statusCode = err.statusCode || 500;
   let error = err.message || 'Internal Server Error';
   if (err instanceof TokenExpiredError) {
