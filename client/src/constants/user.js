@@ -5,4 +5,5 @@ export const userAPI = {
   sendFriendRequest: '/v1/api/user/request/',
   getAllIncomingRequest: '/v1/api/user/requests',
   handleFriendRequest: '/v1/api/user/request/',
+  getAllFriends: '/v1/api/user/friends',
 };

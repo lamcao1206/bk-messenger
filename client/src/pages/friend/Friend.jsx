@@ -5,8 +5,8 @@ import FriendTabs from '../../components/friends/FriendTabs';
 import { useFetch } from '../../hooks/useFetch';
 import { userAPI } from '../../constants';
 import UserContent from '../../components/friends/UserContent';
-import { method } from 'lodash';
 import RequestContent from '../../components/friends/RequestContent';
+import FriendContent from '../../components/friends/FriendContent';
 
 function FriendCardBanner() {
   return (
@@ -19,8 +19,9 @@ function FriendCardBanner() {
 export default function Friend() {
   const [activeTab, setActiveTab] = useState('allFriends');
   const [users, setUsers] = useState([]);
+  const [friends, setFriends] = useState([]);
   const [requests, setRequests] = useState([]);
-  const { error, isLoading, sendRequest } = useFetch();
+  const { sendRequest } = useFetch();
   console.log(requests);
 
   useEffect(() => {
@@ -36,10 +37,19 @@ export default function Friend() {
         setRequests(data.requests);
       });
     };
+    const handleFetchAllFriend = async () => {
+      const config = { method: 'GET', url: userAPI.getAllFriends };
+      sendRequest(config, (data) => {
+        console.log(data);
+        setFriends(data.friends);
+      });
+    };
     if (activeTab === 'allUsers') {
       handleFetchAllUsers();
     } else if (activeTab === 'friendRequests') {
       handleFetchAllIncomingRequest();
+    } else {
+      handleFetchAllFriend();
     }
   }, [activeTab, sendRequest]);
 
@@ -52,6 +62,7 @@ export default function Friend() {
         {activeTab === 'friendRequests' && (
           <RequestContent requests={requests} setRequests={setRequests} sendRequest={sendRequest} />
         )}
+        {activeTab === 'allFriends' && <FriendContent users={friends} />}
       </Card>
     </div>
   );

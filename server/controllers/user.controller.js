@@ -249,4 +249,39 @@ export default class UserController {
       users: usersWithRelationship,
     });
   }
+
+  static async getAllFriends(req, res, next) {
+    const userId = req.user._id;
+    const friendships = await Friendship.find({
+      $and: [{ $or: [{ user1: userId }, { user2: userId }] }, { status: 'accepted' }],
+    })
+      .populate('user1', 'username avatarImage')
+      .populate('user2', 'username avatarImage')
+      .lean();
+
+    if (!friendships || friendships.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: 'No friends found',
+        friends: [],
+        count: 0,
+      });
+    }
+
+    const friends = friendships.map((friendship) => {
+      const friend = friendship.user1._id.toString() === userId.toString() ? friendship.user2 : friendship.user1;
+
+      return {
+        _id: friend._id,
+        username: friend.username,
+        avatarImage: friend.avatarImage,
+      };
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Friends fetched successfully',
+      friends,
+    });
+  }
 }

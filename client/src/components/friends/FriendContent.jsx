@@ -1,38 +1,32 @@
-export default function FriendContent({ activeTab, allFriends, friendRequests, currentPage, usersPerPage }) {
-  const indexOfLastUser = currentPage * usersPerPage;
-  const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentFriends = allFriends.slice(indexOfFirstUser, indexOfLastUser);
-  const currentRequests = friendRequests.slice(indexOfFirstUser, indexOfLastUser);
-
+export default function FriendContent({ users }) {
   return (
-    <div className="h-96 overflow-y-auto mb-4">
-      {activeTab === 'allFriends' && (
-        <div className="grid grid-cols-2 gap-4">
-          {currentFriends.map((friend) => (
-            <div key={friend.id} className="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded">
-              <img src={friend.avatar} alt="Friend" className="w-10 h-10 rounded-full" />
-              <span>{friend.name}</span>
+    <div className="mt-4">
+      <div className="space-y-3 h-[400px] overflow-y-auto">
+        {users.map((user) => (
+          <div
+            key={user._id}
+            className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors"
+          >
+            <div className="flex items-center space-x-3">
+              <img
+                src={user.avatarImage || 'https://via.placeholder.com/40'}
+                alt="User"
+                className="w-10 h-10 rounded-full object-cover"
+              />
+              <span className="font-medium">{user.username}</span>
             </div>
-          ))}
-        </div>
-      )}
+            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm w-[100px] font-semibold">
+              Inbox
+            </button>
+          </div>
+        ))}
 
-      {activeTab === 'friendRequests' && (
-        <div className="flex flex-col space-y-4">
-          {currentRequests.map((request) => (
-            <div key={request.id} className="flex items-center justify-between p-2 hover:bg-gray-100 rounded">
-              <div className="flex items-center space-x-3">
-                <img src={request.avatar} alt="Friend" className="w-10 h-10 rounded-full" />
-                <span>{request.name}</span>
-              </div>
-              <div className="flex space-x-2">
-                <button className="px-4 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">Confirm</button>
-                <button className="px-4 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Delete</button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+        {users.length == 0 && (
+          <div className="flex items-center justify-center">
+            <h1 className="text-2xl font-semibold text-blue-700 opacity-75">No friend found!</h1>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -12,5 +12,6 @@ router.get('/requests', authenticateMiddleware, asyncHandler(UserController.getA
 router.post('/request/:id', authenticateMiddleware, asyncHandler(UserController.sendFriendRequest));
 router.put('/request/:friendshipId', authenticateMiddleware, asyncHandler(UserController.handleFriendRequest));
 router.get('/find', authenticateMiddleware, asyncHandler(UserController.getALlUsersWithRelationship));
+router.get('/friends', authenticateMiddleware, asyncHandler(UserController.getAllFriends));
 
 export default router;
