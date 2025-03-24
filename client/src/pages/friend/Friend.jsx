@@ -1,51 +1,42 @@
 import { FaUserFriends } from 'react-icons/fa';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Card from '../../components/common/Card';
 import FriendTabs from '../../components/friends/FriendTabs';
-import FriendContent from '../../components/friends/FriendContent';
-import Pagination from '../../components/common/Pagination';
+import { useFetch } from '../../hooks/useFetch';
+import { userAPI } from '../../constants';
+import UserContent from '../../components/friends/UserContent';
 
+function FriendCardBanner() {
+  return (
+    <div className="flex items-center space-x-2 mb-6">
+      <FaUserFriends className="text-2xl text-blue-600" />
+      <h2 className="text-2xl font-semibold text-blue-600">Friends</h2>
+    </div>
+  );
+}
 export default function Friend() {
   const [activeTab, setActiveTab] = useState('allFriends');
-  const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 10;
+  const [users, setUsers] = useState([]);
+  const { error, isLoading, sendRequest } = useFetch();
 
-  // Sample data
-  const allFriends = Array.from({ length: 25 }, (_, i) => ({
-    id: i + 1,
-    name: `Friend ${i + 1}`,
-    avatar: 'https://via.placeholder.com/40',
-  }));
-
-  const friendRequests = Array.from({ length: 15 }, (_, i) => ({
-    id: i + 1,
-    name: `Request ${i + 1}`,
-    avatar: 'https://via.placeholder.com/40',
-  }));
-
-  const totalPages = Math.ceil((activeTab === 'allFriends' ? allFriends.length : friendRequests.length) / usersPerPage);
+  useEffect(() => {
+    const handleFetchAllUsers = async () => {
+      const config = { method: 'GET', url: userAPI.searchAllUser };
+      sendRequest(config, (data) => {
+        setUsers(data.users);
+      });
+    };
+    if (activeTab == 'allUsers') {
+      handleFetchAllUsers();
+    }
+  }, [activeTab, sendRequest]);
 
   return (
     <div className="h-screen flex items-center justify-center bg-gray-100">
       <Card className="max-w-2xl w-full p-5">
-        <div className="flex items-center space-x-2 mb-6">
-          <FaUserFriends className="text-2xl text-blue-600" />
-          <h2 className="text-2xl font-semibold text-blue-600">Friends</h2>
-        </div>
-
-        <FriendTabs activeTab={activeTab} setActiveTab={setActiveTab} setCurrentPage={setCurrentPage} />
-
-        <FriendContent
-          activeTab={activeTab}
-          allFriends={allFriends}
-          friendRequests={friendRequests}
-          currentPage={currentPage}
-          usersPerPage={usersPerPage}
-        />
-
-        {activeTab === 'allFriends' && (
-          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
-        )}
+        <FriendCardBanner />
+        <FriendTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+        {activeTab === 'allUsers' && <UserContent users={users} sendRequest={sendRequest} />}
       </Card>
     </div>
   );

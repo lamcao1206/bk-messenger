@@ -48,8 +48,12 @@ export default function RegisterForm() {
     e.preventDefault();
     const validateInput = handleSubmitValidate();
     if (validateInput) {
-      const config = { method: 'POST', url: authAPI.register, data: _.pick(formData, ['username', 'email', 'password']) };
-      sendRequest(config, (data) => {
+      const config = {
+        method: 'POST',
+        url: authAPI.register,
+        data: _.pick(formData, ['username', 'email', 'password']),
+      };
+      sendRequest(config, (_) => {
         toast.success('Register successfully!');
         setTimeout(() => (window.location.href = '/login'), 1000);
       });

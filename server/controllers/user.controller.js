@@ -14,7 +14,7 @@ export default class UserController {
         overwrite: true,
       }
     );
-    const updatedUser = await User.findByIdAndUpdate(req.user._id, { avatarImage: result.secure_url }, { new: true });
+    await User.findByIdAndUpdate(req.user._id, { avatarImage: result.secure_url }, { new: true });
     return res.status(200).json({
       success: true,
       message: 'File uploaded successfully',
@@ -105,7 +105,6 @@ export default class UserController {
 
   static async handleFriendRequest(req, res, next) {
     const userId = req.user._id;
-    const friendShipId = req.params.friendShipId;
     const action = req.query.action;
 
     if (!action || !['accept', 'reject'].includes(action)) {
@@ -159,5 +158,51 @@ export default class UserController {
         },
       });
     }
+  }
+
+  static async getALlUsersWithRelationship(req, res, next) {
+    const userId = req.user._id;
+
+    const totalUsers = await User.countDocuments({ _id: { $ne: userId } });
+
+    const users = await User.find({ _id: { $ne: userId } })
+      .select('username avatarImage')
+      .lean();
+
+    if (!users || users.length === 0) {
+      return res.status(200).json({
+        success: true,
+        users: [],
+        count: 0,
+        totalPages: 0,
+        currentPage: page,
+        limit,
+      });
+    }
+
+    const usersWithRelationship = await Promise.all(
+      users.map(async (user) => {
+        const friendship = await Friendship.findOne({
+          $or: [
+            { user1: userId, user2: user._id },
+            { user1: user._id, user2: userId },
+          ],
+        }).lean();
+
+        let relationship = friendship ? friendship.status : null;
+
+        return {
+          _id: user._id,
+          username: user.username,
+          avatarImage: user.avatarImage,
+          relationship,
+        };
+      })
+    );
+
+    return res.status(200).json({
+      success: true,
+      users: usersWithRelationship,
+    });
   }
 }

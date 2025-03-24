@@ -1,7 +1,6 @@
-export default function FriendTabs({ activeTab, setActiveTab, setCurrentPage }) {
+export default function FriendTabs({ activeTab, setActiveTab }) {
   const handleTabClick = (tab) => {
     setActiveTab(tab);
-    setCurrentPage(1);
   };
 
   return (
@@ -23,6 +22,14 @@ export default function FriendTabs({ activeTab, setActiveTab, setCurrentPage }) 
         onClick={() => handleTabClick('friendRequests')}
       >
         Friend Requests
+      </button>
+      <button
+        className={`pb-2 px-4 ${
+          activeTab === 'allUsers' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-blue-600'
+        }`}
+        onClick={() => handleTabClick('allUsers')}
+      >
+        All Users
       </button>
     </div>
   );
