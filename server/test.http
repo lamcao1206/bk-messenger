@@ -48,3 +48,6 @@ PUT {{base_url}}/v1/api/user/request/67e145520aa9f4ee95deee3f?action=accept
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxhbS5jYW8xMjA2QGhjbXV0LmVkdS52biIsImlhdCI6MTc0MjgxNjc2OSwiZXhwIjoxNzQyOTAzMTY5fQ.uEGD84YJMK88ZyWXKtMsDS-WRi_o0-Wz0biukGkejMI
 
 
+### Fetch all contact lists
+GET {{base_url}}/v1/api/chat/contacts
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxhbS5jYW8xMjA2QGhjbXV0LmVkdS52biIsImlhdCI6MTc0MjkwMDQ3MywiZXhwIjoxNzQyOTg2ODczfQ.Yw5TyreoEXeE3xWyxLHz00q9xJUetcpu1FlgMNh6-ls

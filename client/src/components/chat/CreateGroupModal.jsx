@@ -6,18 +6,20 @@ import Input from '../common/Input';
 export default function CreateGroupModal({ contacts, onClose, onCreateGroup }) {
   const [groupName, setGroupName] = useState('');
   const [selectedContacts, setSelectedContacts] = useState([]);
+  const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
 
   const toggleContactSelection = (contact) => {
-    if (selectedContacts.some((c) => c.id === contact.id)) {
-      setSelectedContacts(selectedContacts.filter((c) => c.id !== contact.id));
+    if (selectedContacts.some((c) => c._id === contact._id)) {
+      setSelectedContacts(selectedContacts.filter((c) => c._id !== contact._id));
     } else {
       setSelectedContacts([...selectedContacts, contact]);
     }
   };
 
-  const handleAvatarUpload = (e) => {
-    const file = e.target.files[0];
+  const handleFileChange = (e) => {
+    let file = e.target.files[0];
+    setAvatarFile(file);
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -28,11 +30,7 @@ export default function CreateGroupModal({ contacts, onClose, onCreateGroup }) {
   };
 
   const handleSubmit = () => {
-    onCreateGroup({
-      name: groupName,
-      members: selectedContacts,
-      avatar: avatarPreview,
-    });
+    onCreateGroup({ name: groupName, users: selectedContacts.map((c) => c._id) }, avatarFile);
     onClose();
   };
 
@@ -57,18 +55,13 @@ export default function CreateGroupModal({ contacts, onClose, onCreateGroup }) {
                 )}
               </div>
             </label>
-            <input id="avatar-upload" type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
+            <input id="avatar-upload" type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
             <span className="text-sm text-gray-500 mt-2">Add group photo</span>
           </div>
 
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-medium mb-1">Group Name</label>
-            <Input
-              type="text"
-              placeholder="Enter group name"
-              value={groupName}
-              onChange={(e) => setGroupName(e.target.value)}
-            />
+            <Input type="text" placeholder="Enter group name" value={groupName} onChange={(e) => setGroupName(e.target.value)} />
           </div>
 
           <div className="mb-4">
@@ -80,22 +73,19 @@ export default function CreateGroupModal({ contacts, onClose, onCreateGroup }) {
             <div className="border rounded-lg overflow-hidden border-neutral-300 overflow-y-scroll h-[200px]">
               {contacts.map((contact) => (
                 <div
-                  key={contact.id}
+                  key={contact._id}
                   className={`flex items-center p-3 hover:bg-gray-50 cursor-pointer transition-colors ${
-                    selectedContacts.some((c) => c.id === contact.id) ? 'bg-blue-50' : ''
+                    selectedContacts.some((c) => c._id === contact._id) ? 'bg-blue-50' : ''
                   }`}
                   onClick={() => toggleContactSelection(contact)}
                 >
                   <div className="relative">
-                    <img src={contact.avatar} alt={contact.name} className="w-10 h-10 rounded-full object-cover" />
-                    {contact.online && (
-                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
-                    )}
+                    <img src={contact.avatarImage} alt={contact.username} className="w-10 h-10 rounded-full object-cover" />
                   </div>
                   <div className="ml-3 flex-1">
-                    <p className="text-sm font-medium">{contact.name}</p>
+                    <p className="text-sm font-medium">{contact.username}</p>
                   </div>
-                  {selectedContacts.some((c) => c.id === contact.id) && (
+                  {selectedContacts.some((c) => c._id === contact._id) && (
                     <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
                       <FaCheck className="text-white text-xs" />
                     </div>
@@ -111,9 +101,7 @@ export default function CreateGroupModal({ contacts, onClose, onCreateGroup }) {
             onClick={handleSubmit}
             disabled={!groupName || selectedContacts.length < 2}
             className={`px-4 py-2 rounded-lg font-medium ${
-              !groupName || selectedContacts.length < 2
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-blue-500 text-white hover:bg-blue-600'
+              !groupName || selectedContacts.length < 2 ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'
             }`}
           >
             Create Group

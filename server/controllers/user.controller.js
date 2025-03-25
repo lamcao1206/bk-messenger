@@ -6,14 +6,11 @@ import User from '../models/user.model.js';
 
 export default class UserController {
   static async upload(req, res, next) {
-    const result = await cloudinary.uploader.upload(
-      `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`,
-      {
-        folder: 'user_avatars',
-        public_id: `avatar_${req.user._id.toString()}`,
-        overwrite: true,
-      }
-    );
+    const result = await cloudinary.uploader.upload(`data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`, {
+      folder: 'user_avatars',
+      public_id: `avatar_${req.user._id.toString()}`,
+      overwrite: true,
+    });
     await User.findByIdAndUpdate(req.user._id, { avatarImage: result.secure_url }, { new: true });
     return res.status(200).json({
       success: true,
@@ -24,11 +21,12 @@ export default class UserController {
 
   static async search(req, res, next) {
     const searchQuery = req.query.q;
+    const userId = req.user._id;
     if (!searchQuery || searchQuery.trim() === '') {
       next(new BadRequestException('Invalid search query'));
     }
 
-    const cacheKey = `user_search:${searchQuery.toLowerCase()}`;
+    const cacheKey = `user_search:${req.user._id}:${searchQuery.toLowerCase()}`;
     const cachedData = await redisClient.get(cacheKey);
 
     if (cachedData) {
@@ -40,11 +38,19 @@ export default class UserController {
       });
     }
 
+    const friendships = await Friendship.find({
+      $and: [{ $or: [{ user1: userId }, { user2: userId }] }, { status: 'accepted' }],
+    }).lean();
+
+    const friendIds = friendships.map((friendship) => (friendship.user1.toString() === userId.toString() ? friendship.user2 : friendship.user1));
+
     const users = await User.find({
+      _id: { $in: friendIds },
       username: { $regex: new RegExp(searchQuery, 'i') },
     })
       .select('username avatarImage')
-      .limit(10);
+      .limit(10)
+      .lean();
 
     if (!users) {
       next(new NotFoundException('No user matching the search query'));
@@ -117,8 +123,7 @@ export default class UserController {
       throw new NotFoundException('Friend request not found');
     }
 
-    const isReceiver =
-      friendship.user1.toString() === userId.toString() || friendship.user2.toString() === userId.toString();
+    const isReceiver = friendship.user1.toString() === userId.toString() || friendship.user2.toString() === userId.toString();
     if (!isReceiver) {
       throw new BadRequestException('You are not authorized to handle this friend request');
     }
