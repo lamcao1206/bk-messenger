@@ -87,9 +87,9 @@ export default class ChatController {
 
     const newRoom = new Room({
       name,
-      users: [...users, admin],
+      users: roomType === 'room' ? [...users, admin] : users,
       admin: roomType === 'room' ? admin : null,
-      chatType: roomType || 'chatbox',
+      chatType: roomType,
     });
     await newRoom.save();
 
@@ -109,6 +109,21 @@ export default class ChatController {
     return res.status(201).json({
       success: true,
       room: populatedRoom,
+    });
+  }
+
+  static async findRoom(req, res, next) {
+    const roomId = req.params.roomId;
+    console.log(roomId);
+
+    if (!roomId) {
+      throw new BadRequestException('Room ID is required');
+    }
+
+    const room = await Room.findById(roomId).populate('users', 'username avatarImage').populate('admin', 'username avatarImage').lean();
+    return res.status(200).json({
+      success: true,
+      room,
     });
   }
 }

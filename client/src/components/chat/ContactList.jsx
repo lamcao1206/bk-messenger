@@ -4,29 +4,23 @@ import { chatAPI, userAPI } from '../../constants';
 import SearchBar from './SearchBar';
 import { FaUsers } from 'react-icons/fa';
 import CreateGroupModal from './CreateGroupModal';
+import { useChatContext } from '../../contexts/ChatContext';
 
 export default function ContactList() {
   const [showCreateGroup, setShowCreateGroup] = useState(false);
   const { sendRequest } = useFetch();
   const [friends, setFriends] = useState([]);
   const [rooms, setRooms] = useState([]);
+  const { chatbox, setChatbox } = useChatContext();
 
   const handleCreateGroup = (groupData, avatarFile) => {
-    console.log(groupData);
-
-    // Create a new FormData object
     const formData = new FormData();
-
-    // Append group data fields
     for (const [key, value] of Object.entries(groupData)) {
       formData.append(key, value);
     }
-
-    // Append the avatar file if provided
     if (avatarFile) {
       formData.append('avatar', avatarFile);
     }
-
     const config = {
       method: 'POST',
       url: chatAPI.createRoom + '?type=room',
@@ -37,8 +31,6 @@ export default function ContactList() {
     };
 
     sendRequest(config, (data) => {
-      console.log(data);
-      // Optionally, update the rooms list with the new group
       setRooms((prevRooms) => [...prevRooms, data]);
     });
 
@@ -49,7 +41,6 @@ export default function ContactList() {
     const handleFetchAllFriend = async () => {
       const config = { method: 'GET', url: userAPI.getAllFriends };
       sendRequest(config, (data) => {
-        console.log(data);
         setFriends(data.friends);
       });
     };
@@ -60,14 +51,17 @@ export default function ContactList() {
 
   useEffect(() => {
     const fetchRooms = async () => {
-      const config = { method: 'GET', url: chatAPI.getContactList }; // Adjust the API endpoint as needed
+      const config = { method: 'GET', url: chatAPI.getContactList };
       sendRequest(config, (data) => {
-        console.log('Fetched rooms:', data);
         setRooms(data.rooms || []);
       });
     };
     fetchRooms();
   }, [sendRequest]);
+
+  const handleChooseRoom = (room) => {
+    setChatbox(room);
+  };
 
   return (
     <div className="w-[400px] h-[85vh] bg-white shadow-2xl rounded-2xl p-4 flex flex-col">
@@ -75,11 +69,13 @@ export default function ContactList() {
       <div className="flex justify-between items-center mb-4">
         <h1 className="font-bold text-2xl text-gray-800">Chats</h1>
         <button
-          className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors duration-200"
-          onClick={() => setShowCreateGroup(true)}
+          className={`p-2 rounded-full transition-all duration-200 ${
+            showCreateGroup ? 'bg-blue-600 text-white shadow-md' : 'bg-blue-100 text-blue-600 hover:bg-blue-200 hover:text-blue-700 hover:shadow-sm'
+          }`}
+          onClick={() => setShowCreateGroup(!showCreateGroup)}
           title="Create Group"
         >
-          <FaUsers className="text-xl text-gray-600" />
+          <FaUsers className="text-xl" />
         </button>
       </div>
 
@@ -91,20 +87,32 @@ export default function ContactList() {
         ) : (
           <ul className="space-y-2">
             {rooms.map((room) => (
-              <li key={room._id} className="flex items-center p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 cursor-pointer">
+              <li
+                key={room._id}
+                className={`flex items-center p-2 rounded-lg transition-colors duration-200 cursor-pointer ${
+                  chatbox?._id === room._id ? 'bg-blue-100 border-l-4 border-blue-500' : 'hover:bg-gray-100'
+                }`}
+                onClick={() => handleChooseRoom(room)}
+              >
                 <div className="relative w-12 h-12 mr-3">
-                  <img src={room.avatarImage} alt={room.name} className="w-full h-full rounded-full object-cover border border-gray-200" />
+                  <img
+                    src={room.avatarImage}
+                    alt={room.name}
+                    className={`w-full h-full rounded-full object-cover border ${chatbox?._id === room._id ? 'border-blue-300' : 'border-gray-200'}`}
+                  />
                   <span className="absolute bottom-0 right-0 w-5 h-5 bg-green-500 rounded-full border-2 border-white"></span>
                 </div>
 
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-center">
-                    <h3 className="text-sm font-semibold text-gray-800 truncate">{room.name}</h3>
-                    <span className="text-xs text-gray-500">
+                    <h3 className={`text-sm font-semibold truncate ${chatbox?._id === room._id ? 'text-blue-700' : 'text-gray-800'}`}>{room.name}</h3>
+                    <span className={`text-xs ${chatbox?._id === room._id ? 'text-blue-600' : 'text-gray-500'}`}>
                       {new Date(room.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500 truncate">{room.latestMessage ? room.latestMessage.content : 'No messages yet'}</p>
+                  <p className={`text-xs truncate ${chatbox?._id === room._id ? 'text-blue-600' : 'text-gray-500'}`}>
+                    {room.latestMessage ? room.latestMessage.content : 'No messages yet'}
+                  </p>
                 </div>
               </li>
             ))}

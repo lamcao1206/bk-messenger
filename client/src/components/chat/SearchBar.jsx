@@ -5,7 +5,7 @@ import { userAPI } from '../../constants';
 
 export default function SearchBar() {
   const [query, setQuery] = useState('');
-  const { error, isLoading, sendRequest } = useFetch();
+  const { sendRequest } = useFetch();
   const abortControllerRef = useRef(null);
   const [searchResults, setSearchResults] = useState([]);
 

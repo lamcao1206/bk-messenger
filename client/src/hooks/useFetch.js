@@ -67,7 +67,7 @@ export const useFetch = () => {
           }
         }
       } catch (e) {
-        toast.error('Session expired - please log in again');
+        toast.error(e.message || 'Session expired - please log in again');
         await logout();
       }
     },
