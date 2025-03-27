@@ -4,13 +4,13 @@ import { chatAPI, userAPI } from '../../constants';
 import SearchBar from './SearchBar';
 import { FaUsers } from 'react-icons/fa';
 import CreateGroupModal from './CreateGroupModal';
-import { useChatContext } from '../../contexts/ChatContext';
+import { useChatStore } from '../../stores/chatStore';
 
 export default function ContactList() {
   const [showCreateGroup, setShowCreateGroup] = useState(false);
   const { sendRequest } = useFetch();
   const [friends, setFriends] = useState([]);
-  const { chatbox, setChatbox, contactList, setContactList } = useChatContext();
+  const { chatbox, setChatbox, contactList, setContactList } = useChatStore();
 
   const handleCreateGroup = (groupData, avatarFile) => {
     const formData = new FormData();
@@ -52,7 +52,6 @@ export default function ContactList() {
     const fetchRooms = async () => {
       const config = { method: 'GET', url: chatAPI.getContactList };
       sendRequest(config, (data) => {
-        console.log(data.rooms);
         setContactList(data.rooms || []);
       });
     };

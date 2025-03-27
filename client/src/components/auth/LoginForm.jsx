@@ -5,13 +5,13 @@ import { FaEnvelope, FaLock } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { useFetch } from '../../hooks/useFetch';
 import { authAPI } from '../../constants';
-import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../../stores/authStore';
 
 export default function LoginForm() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const { error: submitError, isLoading: isSubmitLoading, sendRequest } = useFetch();
-  const { setUser, setToken } = useAuth();
+  const { setUser, setToken } = useAuthStore();
   const navigate = useNavigate();
 
   useEffect(() => {

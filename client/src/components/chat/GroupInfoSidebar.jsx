@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useChatContext } from '../../contexts/ChatContext';
 import { useFetch } from '../../hooks/useFetch';
 import { chatAPI } from '../../constants';
+import { useChatStore } from '../../stores/chatStore';
 
 export function GroupInfoSidebar() {
-  const { chatbox } = useChatContext();
+  const { chatbox } = useChatStore();
   const [roomInfo, setRoomInfo] = useState(null);
   const { sendRequest } = useFetch();
 

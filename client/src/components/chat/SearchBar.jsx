@@ -2,14 +2,14 @@ import { useEffect, useRef, useState } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { useFetch } from '../../hooks/useFetch';
 import { chatAPI, userAPI } from '../../constants';
-import { useChatContext } from '../../contexts/ChatContext';
+import { useChatStore } from '../../stores/chatStore';
 
 export default function SearchBar() {
   const [query, setQuery] = useState('');
   const { sendRequest } = useFetch();
   const abortControllerRef = useRef(null);
   const [searchResults, setSearchResults] = useState([]);
-  const { setChatbox, setContactList } = useChatContext();
+  const { setChatbox, setContactList } = useChatStore();
   const searchRef = useRef(null);
 
   const handleChooseChatbox = (record) => {

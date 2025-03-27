@@ -2,8 +2,8 @@ import { useCallback, useState } from 'react';
 import axios from 'axios';
 import { authAPI } from '../constants';
 import toast from 'react-hot-toast';
-import { useAuth } from '../contexts/AuthContext';
-import { useSocket } from '../contexts/SocketContext';
+import { useAuthStore } from '../stores/authStore';
+import { useSocketStore } from '../stores/socketStore';
 
 const instance = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
@@ -11,11 +11,8 @@ const instance = axios.create({
 });
 
 export const useFetch = () => {
-  const { user, setUser } = useAuth();
-  const { token, setToken } = useAuth();
-  const {
-    socketState: { socket },
-  } = useSocket();
+  const { user, setUser, token, setToken } = useAuthStore();
+  const { socket } = useSocketStore();
 
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -32,7 +29,7 @@ export const useFetch = () => {
       });
       setToken(null);
       setUser(null);
-      socket.emit('OFFLINE', user._id);
+      socket.emit('DISCONNECTED', user._id);
       toast.success('Successfully logged out');
     } catch (e) {
       setError(e?.response?.data || e);
@@ -100,5 +97,5 @@ export const useFetch = () => {
     [token, refreshToken]
   );
 
-  return { error, isLoading, sendRequest };
+  return { error, isLoading, sendRequest, logout };
 };

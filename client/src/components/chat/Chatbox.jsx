@@ -1,11 +1,11 @@
-import { useChatContext } from '../../contexts/ChatContext';
 import { BsCameraVideoFill, BsInfoCircleFill } from 'react-icons/bs';
 import ChatInput from './ChatInput';
 import { useCallback } from 'react';
+import { useChatStore } from '../../stores/chatStore';
 
 // Main Chatbox component
 export default function Chatbox({ showGroupInfo, setShowGroupInfo }) {
-  const { chatbox } = useChatContext();
+  const { chatbox } = useChatStore();
 
   const handleSendMessage = useCallback((data) => {
     // Logic to send the message/file (e.g., API call) can go here

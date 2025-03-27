@@ -1,23 +1,21 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import DropdownMenu from './DropdownNavbar';
 import Avatar from '../common/Avatar';
-import { useSocket } from '../../contexts/SocketContext';
+import { useAuthStore } from '../../stores/authStore';
+import { useFetch } from '../../hooks/useFetch';
 
 export default function Navbar() {
-  const { setToken, user, setUser } = useAuth();
-  const {
-    socketState: { socket },
-  } = useSocket();
+  const { user } = useAuthStore();
+  const { logout } = useFetch();
+  const navigate = useNavigate();
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleLogout = () => {
-    socket.emit('OFFLINE', user._id);
-    setUser(null);
-    setToken(null);
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
   };
 
   const toggleDropdown = () => setIsOpen(!isOpen);
