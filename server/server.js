@@ -4,23 +4,16 @@ import router from './routes/index.js';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import { NotFoundException } from './cores/application.exception.js';
-import { initializeSocket } from './lib/socket.js';
 import initializeDatabase from './lib/db.js';
 import jwt from 'jsonwebtoken';
+import { app, server } from './lib/socket.js';
+import { corsOptions, host, port, cookieSignature } from './lib/config.js';
 const { TokenExpiredError } = jwt;
-
-const app = express();
-const port = process.env.PORT || 3000;
-
-const corsOptions = {
-  origin: process.env.URL_CLIENT || 'http://localhost:5173',
-  credentials: true,
-};
 
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser(process.env.COOKIE_SIGNATURE));
+app.use(cookieParser(cookieSignature));
 
 app.use(morgan('dev'));
 
@@ -50,10 +43,9 @@ app.use((err, req, res, next) => {
 initializeDatabase()
   .then(() => {
     console.log('Connected to MongoDB');
-    const server = app.listen(port, () => {
-      console.log(`Server is listening on port ${port}`);
+    server.listen(port, host, () => {
+      console.log(`Server is running on ${host}:${port}...`);
     });
-    initializeSocket(server, corsOptions);
   })
   .catch((err) => {
     console.error('Failed to connect to MongoDB', err);
