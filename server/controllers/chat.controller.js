@@ -2,8 +2,13 @@ import { BadRequestException } from '../cores/application.exception.js';
 import cloudinary from '../lib/cloudinary.js';
 import Message from '../models/message.model.js';
 import Room from '../models/room.model.js';
+import mongoose from 'mongoose';
+import User from '../models/user.model.js';
 
 export default class ChatController {
+  /**
+   * Load all the recent rooms with latest message in it (for ContactList Component UI)
+   */
   static async getContactList(req, res, next) {
     const userId = req.user._id;
     const rooms = await Room.find({ users: userId }).populate('users', 'username avatarImage').populate('admin', 'username avatarImage').lean();
@@ -16,13 +21,12 @@ export default class ChatController {
       rooms.map(async (room) => {
         const { _id, name, avatarImage, chatType, users, admin, createdAt } = room;
         const latestMessage = await Message.findOne({ room: _id }).sort({ createdAt: -1 }).populate('sender', 'username').lean();
-        let roomRecord;
+        let record = null;
         if (chatType === 'chatbox') {
-          // A chatbox only have 2 users
           const otherUser = users.find((u) => u._id.toString() !== userId.toString());
-          roomRecord = {
+          record = {
             _id,
-            name: otherUser.name,
+            name: otherUser.username,
             avatarImage: otherUser.avatarImage,
             latestMessage: latestMessage
               ? {
@@ -31,9 +35,10 @@ export default class ChatController {
                   timestamp: latestMessage.createdAt,
                 }
               : null,
+            createdAt,
           };
         } else {
-          roomRecord = {
+          record = {
             _id,
             name,
             avatarImage,
@@ -48,7 +53,7 @@ export default class ChatController {
               : null,
           };
         }
-        return roomRecord;
+        return record;
       })
     );
     return res.status(200).json({
@@ -65,7 +70,9 @@ export default class ChatController {
       }),
     });
   }
-
+  /**
+   * Create the Room (Chatbox) base on roomType and []users
+   */
   static async createRoom(req, res, next) {
     let { name, users } = req.body;
     const roomType = req.query.type;
@@ -112,9 +119,11 @@ export default class ChatController {
     });
   }
 
-  static async findRoom(req, res, next) {
+  /**
+   * Find the room by roomId
+   */
+  static async findRoomById(req, res, next) {
     const roomId = req.params.roomId;
-    console.log(roomId);
 
     if (!roomId) {
       throw new BadRequestException('Room ID is required');
@@ -124,6 +133,69 @@ export default class ChatController {
     return res.status(200).json({
       success: true,
       room,
+    });
+  }
+
+  /**
+   * Find the chatbox (only contain 2 users) by 1 username in it
+   * If no chatbox found, create a new one and return that chatbox
+   */
+  static async findChatboxByUserId(req, res, next) {
+    const targetUserId = req.params.id;
+    const userId = req.user._id;
+    if (!targetUserId || targetUserId.trim() === '') {
+      throw new BadRequestException('User ID is required');
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(targetUserId)) {
+      throw new BadRequestException('Invalid User ID');
+    }
+    let targetUser = await User.findById(targetUserId);
+    let chatbox = await Room.findOne({
+      chatType: 'chatbox',
+      users: { $all: [userId, targetUser._id], $size: 2 },
+    })
+      .populate('users', 'username avatarImage')
+      .lean();
+
+    /**
+     * If no chatbox found, create a new one
+     */
+    if (!chatbox) {
+      const newRoom = new Room({
+        name: `${targetUser.username}-${req.user.username}`, // Use a combination of usernames as the room name
+        users: [userId, targetUser._id],
+        chatType: 'chatbox',
+      });
+      await newRoom.save();
+      chatbox = await Room.findById(newRoom._id).populate('users', 'username avatarImage').lean();
+    }
+
+    const latestMessage = await Message.findOne({ room: chatbox._id }).sort({ createdAt: -1 }).populate('sender', 'username').lean();
+    const otherUser = chatbox.users.find((u) => u._id.toString() !== userId.toString());
+    const chatboxRecord = {
+      _id: chatbox._id,
+      name: otherUser.username,
+      avatarImage: otherUser.avatarImage,
+      chatType: chatbox.chatType,
+      users: chatbox.users.map((user) => ({
+        _id: user._id,
+        username: user.username,
+        avatarImage: user.avatarImage,
+      })),
+      createdAt: chatbox.createdAt,
+      latestMessage: latestMessage
+        ? {
+            text: latestMessage.type === 'text' ? latestMessage.content : `${latestMessage.sender.username} sent an attachment`,
+            sender: latestMessage.sender.username,
+            timestamp: latestMessage.createdAt,
+          }
+        : null,
+    };
+
+    return res.status(200).json({
+      success: true,
+      chatbox: chatboxRecord,
     });
   }
 }

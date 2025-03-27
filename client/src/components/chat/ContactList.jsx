@@ -10,8 +10,7 @@ export default function ContactList() {
   const [showCreateGroup, setShowCreateGroup] = useState(false);
   const { sendRequest } = useFetch();
   const [friends, setFriends] = useState([]);
-  const [rooms, setRooms] = useState([]);
-  const { chatbox, setChatbox } = useChatContext();
+  const { chatbox, setChatbox, contactList, setContactList } = useChatContext();
 
   const handleCreateGroup = (groupData, avatarFile) => {
     const formData = new FormData();
@@ -31,7 +30,7 @@ export default function ContactList() {
     };
 
     sendRequest(config, (data) => {
-      setRooms((prevRooms) => [...prevRooms, data]);
+      setContactList((prevRooms) => [...prevRooms, data]);
     });
 
     setShowCreateGroup(false);
@@ -53,11 +52,12 @@ export default function ContactList() {
     const fetchRooms = async () => {
       const config = { method: 'GET', url: chatAPI.getContactList };
       sendRequest(config, (data) => {
-        setRooms(data.rooms || []);
+        console.log(data.rooms);
+        setContactList(data.rooms || []);
       });
     };
     fetchRooms();
-  }, [sendRequest]);
+  }, [sendRequest, setContactList]);
 
   const handleChooseRoom = (room) => {
     setChatbox(room);
@@ -82,11 +82,11 @@ export default function ContactList() {
       <SearchBar />
 
       <div className="flex-1 overflow-y-auto mt-4">
-        {rooms.length === 0 ? (
+        {contactList.length === 0 ? (
           <div className="text-gray-500 text-center mt-4">No chats available</div>
         ) : (
           <ul className="space-y-2">
-            {rooms.map((room) => (
+            {contactList.map((room) => (
               <li
                 key={room._id}
                 className={`flex items-center p-2 rounded-lg transition-colors duration-200 cursor-pointer ${

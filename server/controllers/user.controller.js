@@ -5,6 +5,9 @@ import Friendship from '../models/friendship.model.js';
 import User from '../models/user.model.js';
 
 export default class UserController {
+  /**
+   * Upload Image to Cloudinary
+   */
   static async upload(req, res, next) {
     const result = await cloudinary.uploader.upload(`data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`, {
       folder: 'user_avatars',
@@ -18,6 +21,11 @@ export default class UserController {
       avatarImage: result.secure_url,
     });
   }
+
+  /**
+   * Search friend based on query
+   * TODO: search the room
+   */
 
   static async search(req, res, next) {
     const searchQuery = req.query.q;
@@ -275,7 +283,6 @@ export default class UserController {
 
     const friends = friendships.map((friendship) => {
       const friend = friendship.user1._id.toString() === userId.toString() ? friendship.user2 : friendship.user1;
-
       return {
         _id: friend._id,
         username: friend.username,

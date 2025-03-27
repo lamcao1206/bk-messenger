@@ -8,6 +8,7 @@ const router = express.Router();
 
 router.get('/contacts', authenticateMiddleware, asyncHandler(ChatController.getContactList));
 router.post('/room/create', authenticateMiddleware, upload.single('avatar'), asyncHandler(ChatController.createRoom));
-router.get('/room/:roomId', authenticateMiddleware, asyncHandler(ChatController.findRoom));
+router.get('/room/:roomId', authenticateMiddleware, asyncHandler(ChatController.findRoomById));
+router.get('/chatbox/:id', authenticateMiddleware, asyncHandler(ChatController.findChatboxByUserId));
 
 export default router;

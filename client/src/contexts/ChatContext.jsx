@@ -6,6 +6,7 @@ export const useChatContext = () => useContext(ChatContext);
 
 export function ChatContextProvider({ children }) {
   const [chatbox, setChatbox] = useState(null);
+  const [contactList, setContactList] = useState([]);
 
-  return <ChatContext.Provider value={{ chatbox, setChatbox }}>{children}</ChatContext.Provider>;
+  return <ChatContext.Provider value={{ chatbox, setChatbox, contactList, setContactList }}>{children}</ChatContext.Provider>;
 }
