@@ -28,14 +28,15 @@ export default class ChatController {
             _id,
             name: otherUser.username,
             avatarImage: otherUser.avatarImage,
+            chatType,
+            createdAt,
             latestMessage: latestMessage
               ? {
-                  text: latestMessage.type === 'text' ? latestMessage.content : `${latestMessage.sender.username} sent an attachment`,
+                  content: latestMessage.type === 'text' ? latestMessage.content : `${latestMessage.sender.username} sent an attachment`,
                   sender: latestMessage.sender.username,
                   timestamp: latestMessage.createdAt,
                 }
               : null,
-            createdAt,
           };
         } else {
           record = {
@@ -46,7 +47,7 @@ export default class ChatController {
             createdAt,
             latestMessage: latestMessage
               ? {
-                  text: latestMessage.type === 'text' ? latestMessage.content : `${latestMessage.sender.username} sent an attachment`,
+                  content: latestMessage.type === 'text' ? latestMessage.content : `${latestMessage.sender.username} sent an attachment`,
                   sender: latestMessage.sender.username,
                   timestamp: latestMessage.createdAt,
                 }
@@ -56,18 +57,22 @@ export default class ChatController {
         return record;
       })
     );
+
+    const sortedRooms = roomsRecord.sort((r1, r2) => {
+      if (r1.latestMessage && r2.latestMessage) {
+        return new Date(r2.latestMessage.timestamp) - new Date(r1.latestMessage.timestamp);
+      }
+      if (!r1.latestMessage && r2.latestMessage) {
+        return 1;
+      }
+      if (r1.latestMessage && !r2.latestMessage) {
+        return -1;
+      }
+      return new Date(r2.createdAt) - new Date(r1.createdAt);
+    });
     return res.status(200).json({
       success: true,
-      rooms: roomsRecord.sort(function (r1, r2) {
-        if (r1.latestMessage === null && r2.latestMessage === null) {
-          return r1.createdAt < r2.createdAt;
-        } else if (r1.latestMessage === null) {
-          return -1;
-        } else if (r2.latestMessage === null) {
-          return 1;
-        }
-        return r1.latestMessage.timestamp < r2.latestMessage.timestamp;
-      }),
+      rooms: sortedRooms,
     });
   }
   /**
@@ -101,7 +106,6 @@ export default class ChatController {
     await newRoom.save();
 
     if (req.file) {
-      const avatarFileImage = req.file;
       const result = await cloudinary.uploader.upload(`data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`, {
         folder: 'rooms_avatars',
         public_id: `avatar_${newRoom._id.toString()}`,

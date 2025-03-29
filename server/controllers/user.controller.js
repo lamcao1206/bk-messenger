@@ -26,7 +26,6 @@ export default class UserController {
    * Search friend based on query
    * TODO: search the room
    */
-
   static async search(req, res, next) {
     const searchQuery = req.query.q;
     const userId = req.user._id;
