@@ -18,6 +18,16 @@ export default function ChatInput({ onSend }) {
     }
   }, [message, selectedFile, onSend]);
 
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.key === 'Enter' && (message || selectedFile) && !e.shiftKey) {
+        e.preventDefault();
+        handleSend();
+      }
+    },
+    [handleSend, message, selectedFile]
+  );
+
   return (
     <div className="p-2 border-t border-gray-200 bg-white">
       {selectedFile && (
@@ -37,6 +47,7 @@ export default function ChatInput({ onSend }) {
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          onKeyDown={handleKeyDown} // Replaced onKeyPress with onKeyDown
           placeholder="Type a message..."
           className="flex-1 px-3 py-2 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent bg-gray-50 shadow-sm transition-all duration-200"
         />

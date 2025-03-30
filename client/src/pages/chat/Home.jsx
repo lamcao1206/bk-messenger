@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import Chatbox from '../../components/chat/Chatbox';
 import ContactList from '../../components/chat/ContactList';
 import { GroupInfoSidebar } from '../../components/chat/GroupInfoSidebar';
-import { useSocketStore } from '../../stores/socketStore';
 import { useAuthStore } from '../../stores/authStore';
+import { useChatStore } from '../../stores/chatStore';
 
 export default function Home() {
   const [showGroupInfo, setShowGroupInfo] = useState(false);
-  const { socket, socketConnect, isConnected } = useSocketStore();
+  const { socketConnect, isConnected, disconnectSocket } = useChatStore();
   const { user } = useAuthStore();
 
   useEffect(() => {
@@ -18,14 +18,14 @@ export default function Home() {
         console.log('Socket connected, emitted ONLINE for user:', user._id);
       });
     }
-  }, [user, isConnected, socketConnect]);
 
-  useEffect(() => {
-    console.log('Current socket:', socket);
-  }, [socket]);
+    return () => {
+      disconnectSocket();
+    };
+  }, [user, isConnected, socketConnect, disconnectSocket]);
 
   return (
-    <div className="flex justify-center items-start bg-gray-100 h-[100vh] p-5 gap-5">
+    <div className="flex justify-center items-start bg-gray-100 h-screen p-5 gap-5">
       <ContactList />
       <Chatbox showGroupInfo={showGroupInfo} setShowGroupInfo={setShowGroupInfo} />
       {showGroupInfo && (

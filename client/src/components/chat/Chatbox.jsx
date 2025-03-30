@@ -1,16 +1,92 @@
 import { BsCameraVideoFill, BsInfoCircleFill } from 'react-icons/bs';
 import ChatInput from './ChatInput';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { useChatStore } from '../../stores/chatStore';
+import { chatAPI } from '../../constants/chat';
+import { useFetch } from '../../hooks/useFetch';
+import { useAuthStore } from '../../stores/authStore';
 
-// Main Chatbox component
 export default function Chatbox({ showGroupInfo, setShowGroupInfo }) {
-  const { chatbox } = useChatStore();
+  const { chatbox, subcribeMessages, unscribeFromMessages } = useChatStore();
+  const { sendRequest } = useFetch();
+  const { user } = useAuthStore();
+  const [messages, setMessages] = useState([]);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
 
-  const handleSendMessage = useCallback((data) => {
-    // Logic to send the message/file (e.g., API call) can go here
-    console.log('Sending:', data);
-  }, []);
+  useEffect(() => {
+    if (chatbox) {
+      subcribeMessages();
+    }
+    return () => {
+      unscribeFromMessages();
+    };
+  }, [chatbox, subcribeMessages, unscribeFromMessages]);
+
+  const fetchMessages = useCallback(
+    async (pageNum) => {
+      if (!chatbox?._id) return;
+      const config = {
+        method: 'GET',
+        url: `${chatAPI.getMessage}${chatbox._id}?page=${pageNum}`,
+      };
+
+      sendRequest(config, (data) => {
+        const newMessages = data.messages.reverse() || [];
+        setMessages((prev) => (pageNum === 0 ? newMessages : [...prev, ...newMessages]));
+        setHasMore((pageNum + 1) * 10 < data.total);
+      });
+    },
+    [chatbox?._id, sendRequest]
+  );
+
+  useEffect(() => {
+    fetchMessages(0);
+  }, [chatbox?._id, fetchMessages]);
+
+  const handleScroll = useCallback(() => {
+    const container = messagesContainerRef.current;
+    if (container.scrollTop === 0 && hasMore) {
+      setPage((prev) => prev + 1);
+    }
+  }, [hasMore]);
+
+  useEffect(() => {
+    if (page > 0) {
+      fetchMessages(page);
+    }
+  }, [page, fetchMessages]);
+
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+      return () => container.removeEventListener('scroll', handleScroll);
+    }
+  }, [handleScroll]);
+
+  const handleSendMessage = useCallback(
+    async (data) => {
+      const formData = new FormData();
+      formData.append('type', data.selectedFile ? 'file' : 'text');
+      if (data.message) formData.append('content', data.message);
+      if (data.selectedFile) formData.append('file', data.selectedFile);
+
+      const config = {
+        method: 'POST',
+        url: chatAPI.sendMessage + chatbox._id,
+        data: formData,
+        header: { 'Content-Type': 'multipart/form-data' },
+      };
+
+      sendRequest(config, (data) => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      });
+    },
+    [sendRequest, chatbox?._id]
+  );
 
   return (
     <div className="w-[800px] h-[85vh] bg-white shadow-2xl rounded-2xl flex flex-col overflow-hidden">
@@ -44,13 +120,27 @@ export default function Chatbox({ showGroupInfo, setShowGroupInfo }) {
             </div>
           </div>
 
-          {/* Messages Area */}
-          <div className="flex-1 p-6 overflow-y-auto bg-gradient-to-b from-gray-50 to-white">
-            {chatbox.latestMessage ? (
-              <p className="text-gray-700 bg-white p-3 rounded-lg shadow-sm inline-block max-w-[70%]">{chatbox.latestMessage}</p>
+          <div ref={messagesContainerRef} className="flex-1 p-6 overflow-y-auto bg-gradient-to-b from-gray-50 to-white flex flex-col">
+            {messages.length > 0 ? (
+              messages.map((msg) => (
+                <div key={msg._id} className={`flex ${msg.sender._id === user._id ? 'justify-end' : 'justify-start'} mb-4`}>
+                  {msg.sender._id !== user._id && <img src={msg.sender.avatarImage} alt="avatar" className="w-8 h-8 rounded-full mr-2 self-end" />}
+                  <div
+                    className={`max-w-[70%] p-3 rounded-lg shadow-sm ${
+                      msg.sender._id === user._id ? 'bg-blue-500 text-white rounded-br-none' : 'bg-white text-gray-700 rounded-bl-none'
+                    }`}
+                  >
+                    <p>{msg.content}</p>
+                    <span className={`text-xs ${msg.sender._id === user._id ? 'text-blue-100' : 'text-gray-400'}`}>
+                      {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                </div>
+              ))
             ) : (
               <p className="text-gray-500 italic text-center py-10">Start the conversation...</p>
             )}
+            <div ref={messagesEndRef} />
           </div>
 
           <ChatInput onSend={handleSendMessage} />

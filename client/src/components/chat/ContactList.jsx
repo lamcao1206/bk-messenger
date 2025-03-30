@@ -10,7 +10,21 @@ export default function ContactList() {
   const [showCreateGroup, setShowCreateGroup] = useState(false);
   const { sendRequest } = useFetch();
   const [friends, setFriends] = useState([]);
-  const { chatbox, setChatbox, contactList, setContactList } = useChatStore();
+  const { chatbox, setChatbox, contactList, setContactList, socket, updateContactListWithNewMessage } = useChatStore();
+
+  useEffect(() => {
+    if (socket) {
+      const handleNewMessage = (message) => {
+        updateContactListWithNewMessage(message);
+      };
+
+      socket.on('MESSAGE', handleNewMessage);
+
+      return () => {
+        socket.off('MESSAGE', handleNewMessage);
+      };
+    }
+  }, [socket, updateContactListWithNewMessage]);
 
   const handleCreateGroup = (groupData, avatarFile) => {
     const formData = new FormData();
@@ -52,11 +66,12 @@ export default function ContactList() {
     const fetchRooms = async () => {
       const config = { method: 'GET', url: chatAPI.getContactList };
       sendRequest(config, (data) => {
+        console.log(data.rooms);
         setContactList(data.rooms || []);
       });
     };
     fetchRooms();
-  }, [sendRequest, setContactList]);
+  }, []);
 
   const handleChooseRoom = (room) => {
     setChatbox(room);

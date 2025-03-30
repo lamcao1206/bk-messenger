@@ -3,7 +3,7 @@ import axios from 'axios';
 import { authAPI } from '../constants';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../stores/authStore';
-import { useSocketStore } from '../stores/socketStore';
+import { useChatStore } from '../stores/chatStore';
 
 const instance = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
@@ -12,7 +12,7 @@ const instance = axios.create({
 
 export const useFetch = () => {
   const { user, setUser, token, setToken } = useAuthStore();
-  const { socket } = useSocketStore();
+  const { socket } = useChatStore();
 
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
