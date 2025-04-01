@@ -2,27 +2,24 @@ import { useEffect, useState } from 'react';
 import Chatbox from '../../components/chat/Chatbox';
 import ContactList from '../../components/chat/ContactList';
 import { GroupInfoSidebar } from '../../components/chat/GroupInfoSidebar';
-import { useAuthStore } from '../../stores/authStore';
 import { useChatStore } from '../../stores/chatStore';
+import { useAuthStore } from '../../stores/authStore';
 
 export default function Home() {
   const [showGroupInfo, setShowGroupInfo] = useState(false);
-  const { socketConnect, isConnected, disconnectSocket } = useChatStore();
-  const { user } = useAuthStore();
+  const { subcribeMessages, unscribeFromMessages } = useChatStore();
+  const { initialize } = useAuthStore();
 
   useEffect(() => {
-    if (user && !isConnected) {
-      const socketInstance = socketConnect();
-      socketInstance.on('connect', () => {
-        socketInstance.emit('ONLINE', user._id);
-        console.log('Socket connected, emitted ONLINE for user:', user._id);
-      });
-    }
+    initialize();
+  }, []);
 
+  useEffect(() => {
+    subcribeMessages();
     return () => {
-      disconnectSocket();
+      unscribeFromMessages();
     };
-  }, [user, isConnected, socketConnect, disconnectSocket]);
+  }, [subcribeMessages, unscribeFromMessages]);
 
   return (
     <div className="flex justify-center items-start bg-gray-100 h-screen p-5 gap-5">

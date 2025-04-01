@@ -11,7 +11,7 @@ import { useAuthStore } from '../../stores/authStore';
 export default function LoginForm() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const { error: submitError, isLoading: isSubmitLoading, sendRequest } = useFetch();
-  const { setUser, setToken } = useAuthStore();
+  const { setUser, setToken, connectSocket } = useAuthStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,6 +51,7 @@ export default function LoginForm() {
         toast.success('Login successfully!');
         setUser(data.user);
         setToken(data.token);
+        connectSocket();
         setTimeout(navigate('/'), 1000);
       });
     }

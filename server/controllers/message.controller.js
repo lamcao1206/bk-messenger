@@ -8,8 +8,6 @@ export default class MessageController {
   static async getMessage(req, res, next) {
     const roomId = req.params.id;
     const userId = req.user._id;
-    const page = parseInt(req.query.page) || 0;
-    const size = parseInt(req.query.size) || 10;
 
     if (!roomId || !mongoose.Types.ObjectId.isValid(roomId)) {
       throw new BadRequestException('Invalid Room ID');
@@ -29,13 +27,7 @@ export default class MessageController {
       throw new BadRequestException('You are not a member of this room');
     }
 
-    const skip = page * size;
-    const messages = await Message.find({ room: roomId })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(size)
-      .populate('sender', 'username avatarImage')
-      .lean();
+    const messages = await Message.find({ room: roomId }).sort({ createdAt: -1 }).populate('sender', 'username avatarImage').lean();
     const totalMessages = await Message.countDocuments({ room: roomId });
     const formattedMessageRecords = messages.map((message) => ({
       _id: message._id,
@@ -56,11 +48,7 @@ export default class MessageController {
       success: true,
       messages: formattedMessageRecords,
       options: {
-        page,
-        size,
         totalMessages,
-        totalPages: Math.ceil(totalMessages / size),
-        hasMore: (page + 1) * size < totalMessages,
       },
     });
   }

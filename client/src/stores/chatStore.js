@@ -1,59 +1,30 @@
 import { create } from 'zustand';
-import { io } from 'socket.io-client';
+import { useAuthStore } from './authStore';
 
 export const useChatStore = create((set, get) => ({
   chatbox: null,
   contactList: [],
   messages: [],
-  socket: null,
-  onlineUsers: [],
-  isConnected: false,
 
   setChatbox: (chatbox) => set({ chatbox }),
   setContactList: (contactList) => set({ contactList }),
   setMessages: (messages) => set({ messages }),
 
-  socketConnect: () => {
-    const existingSocket = get().socket;
-    if (existingSocket && get().isConnected) return existingSocket;
-
-    const socket = io(import.meta.env.VITE_BASE_URL);
-    socket.on('connect', () => {
-      set({ socket, isConnected: true });
-    });
-    socket.on('GET_ONLINE_USERS', (users) => {
-      set({ onlineUsers: users });
-    });
-    socket.on('disconnect', () => {
-      set({ socket: null, isConnected: false, onlineUsers: [] });
-    });
-    socket.on('connect_error', (error) => {
-      console.error('Socket connection error:', error);
-    });
-    return socket;
-  },
-
-  disconnectSocket: () => {
-    const socket = get().socket;
-    if (socket) {
-      socket.disconnect();
-      set({ socket: null, isConnected: false, onlineUsers: [] });
-    }
-  },
-
   subcribeMessages: () => {
-    const { chatbox, socket, messages } = get();
-    if (!chatbox || !socket) return;
-    socket.off('MESSAGE');
+    const { chatbox } = get();
+    if (!chatbox) return;
+    const socket = useAuthStore.getState().socket;
+
     socket.on('MESSAGE', (newMessage) => {
       if (newMessage.room === chatbox._id) {
-        set({ messages: [...messages, newMessage] });
+        set({ messages: [...get().messages, newMessage] });
       }
+      get().updateContactListWithNewMessage(newMessage);
     });
   },
 
   unscribeFromMessages: () => {
-    const { socket } = get();
+    const socket = useAuthStore.getState().socket;
     if (socket) {
       socket.off('MESSAGE');
     }

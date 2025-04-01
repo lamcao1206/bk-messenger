@@ -16,15 +16,6 @@ export default function Chatbox({ showGroupInfo, setShowGroupInfo }) {
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
 
-  useEffect(() => {
-    if (chatbox) {
-      subcribeMessages();
-    }
-    return () => {
-      unscribeFromMessages();
-    };
-  }, [chatbox, subcribeMessages, unscribeFromMessages]);
-
   const fetchMessages = useCallback(
     async (pageNum) => {
       if (!chatbox?._id) return;

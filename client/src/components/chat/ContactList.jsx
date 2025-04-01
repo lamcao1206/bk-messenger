@@ -10,21 +10,7 @@ export default function ContactList() {
   const [showCreateGroup, setShowCreateGroup] = useState(false);
   const { sendRequest } = useFetch();
   const [friends, setFriends] = useState([]);
-  const { chatbox, setChatbox, contactList, setContactList, socket, updateContactListWithNewMessage } = useChatStore();
-
-  useEffect(() => {
-    if (socket) {
-      const handleNewMessage = (message) => {
-        updateContactListWithNewMessage(message);
-      };
-
-      socket.on('MESSAGE', handleNewMessage);
-
-      return () => {
-        socket.off('MESSAGE', handleNewMessage);
-      };
-    }
-  }, [socket, updateContactListWithNewMessage]);
+  const { chatbox, setChatbox, contactList, setContactList } = useChatStore();
 
   const handleCreateGroup = (groupData, avatarFile) => {
     const formData = new FormData();
@@ -46,7 +32,6 @@ export default function ContactList() {
     sendRequest(config, (data) => {
       setContactList((prevRooms) => [...prevRooms, data]);
     });
-
     setShowCreateGroup(false);
   };
 
@@ -72,10 +57,6 @@ export default function ContactList() {
     };
     fetchRooms();
   }, []);
-
-  const handleChooseRoom = (room) => {
-    setChatbox(room);
-  };
 
   return (
     <div className="w-[400px] h-[85vh] bg-white shadow-2xl rounded-2xl p-4 flex flex-col">
@@ -106,7 +87,7 @@ export default function ContactList() {
                 className={`flex items-center p-2 rounded-lg transition-colors duration-200 cursor-pointer ${
                   chatbox?._id === room._id ? 'bg-blue-100 border-l-4 border-blue-500' : 'hover:bg-gray-100'
                 }`}
-                onClick={() => handleChooseRoom(room)}
+                onClick={() => setChatbox(room)}
               >
                 <div className="relative w-12 h-12 mr-3">
                   <img
